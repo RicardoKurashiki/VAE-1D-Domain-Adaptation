@@ -61,13 +61,13 @@ def load_data(path, split="train", transform=None, val_transform=None):
 
     if split == "train":
         dataset = CustomDataset(df, transform=transform)
-        print(f"Encontrados {len(df)} amostras no dataset de treinamento")
+        print(f"Found {len(df)} samples in the training dataset")
     elif split == "val":
         dataset = CustomDataset(df, transform=val_transform)
-        print(f"Encontrados {len(df)} amostras no dataset de validação")
+        print(f"Found {len(df)} samples in the validation dataset")
     elif split == "test":
         dataset = CustomDataset(df, transform=transform)
-        print(f"Encontrados {len(df)} amostras no dataset de teste")
+        print(f"Found {len(df)} samples in the test dataset")
     else:
         raise ValueError(f"Invalid split: {split}. Must be 'train', 'val', or 'test'")
 

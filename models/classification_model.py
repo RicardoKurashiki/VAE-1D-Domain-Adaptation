@@ -43,12 +43,12 @@ class ClassificationModel:
 
         architecture_text = []
         architecture_text.append("=" * 90)
-        architecture_text.append("ARQUITETURA DO MODELO")
+        architecture_text.append("MODEL ARCHITECTURE")
         architecture_text.append("=" * 90)
         architecture_text.append(f"\nBackbone: {self.backbone}")
-        architecture_text.append(f"Número de classes: {self.num_classes}")
-        architecture_text.append(f"Camadas treináveis: {self.trainable_layers}")
-        architecture_text.append(f"Tipo de classificador: {self.classifier_type}")
+        architecture_text.append(f"Number of classes: {self.num_classes}")
+        architecture_text.append(f"Trainable layers: {self.trainable_layers}")
+        architecture_text.append(f"Classifier type: {self.classifier_type}")
         architecture_text.append("\n" + "-" * 90)
         architecture_text.append(
             f"{'Layer Name':50} {'Type':20} {'Trainable':10} {'Parameters'}"
@@ -75,14 +75,14 @@ class ClassificationModel:
                 )
 
         architecture_text.append("-" * 90)
-        architecture_text.append(f"\nTotal de parâmetros: {total_params:,}")
-        architecture_text.append(f"Parâmetros treináveis: {trainable_params:,}")
+        architecture_text.append(f"\nTotal parameters: {total_params:,}")
+        architecture_text.append(f"Trainable parameters: {trainable_params:,}")
         architecture_text.append(
-            f"Parâmetros congelados: {total_params - trainable_params:,}"
+            f"Frozen parameters: {total_params - trainable_params:,}"
         )
         architecture_text.append("=" * 90)
 
-        architecture_text.append("\n\nREPRESENTAÇÃO COMPLETA DO MODELO:\n")
+        architecture_text.append("\n\nFULL MODEL REPRESENTATION:\n")
         architecture_text.append(str(self.model))
 
         architecture_file = os.path.join(output_path, "model_architecture.txt")

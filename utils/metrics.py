@@ -6,7 +6,7 @@ import torch.nn as nn
 import numpy as np
 from typing import Dict, Any, Tuple, Optional
 
-# Tentar importar pynvml para métricas de GPU
+# Try to import pynvml for GPU metrics
 try:
     import pynvml
     PYNVML_AVAILABLE = True
@@ -20,7 +20,7 @@ device = (
 )
 
 def get_gpu_utilization() -> Optional[Dict[str, float]]:
-    """Retorna utilização da GPU usando pynvml (nvidia-ml-py)."""
+    """Returns GPU utilization using pynvml (nvidia-ml-py)."""
     if not PYNVML_AVAILABLE or not torch.cuda.is_available():
         return None
 
@@ -47,7 +47,7 @@ def get_gpu_utilization() -> Optional[Dict[str, float]]:
 
 
 def get_cpu_utilization() -> Dict[str, float]:
-    """Retorna utilização da CPU."""
+    """Returns CPU utilization."""
     cpu_freq = psutil.cpu_freq()
 
     return {
@@ -119,8 +119,8 @@ def get_parameters_count(model: nn.Module) -> Dict[str, int]:
 
 def calculate_flops(model: nn.Module, input_size: Tuple[int, ...]) -> Dict[str, Any]:
     """
-    Calcula FLOPs do modelo considerando todas as camadas relevantes.
-    Retorna dicionário com FLOPs totais e breakdown por tipo de camada.
+    Calculates model FLOPs considering all relevant layers.
+    Returns a dictionary with total FLOPs and a breakdown by layer type.
     """
     flops_by_layer = {
         "conv": 0,
@@ -135,7 +135,7 @@ def calculate_flops(model: nn.Module, input_size: Tuple[int, ...]) -> Dict[str, 
     def hook_fn(module, input, output):
         class_name = module.__class__.__name__
 
-        # Convolução 2D (considera grupos para depthwise separable)
+        # 2D convolution (accounts for groups for depthwise separable)
         if class_name == 'Conv2d':
             out_h, out_w = output.shape[2:]
             # FLOPs = 2 * K_h * K_w * (C_in / groups) * C_out * H_out * W_out
@@ -145,7 +145,7 @@ def calculate_flops(model: nn.Module, input_size: Tuple[int, ...]) -> Dict[str, 
                 * (module.in_channels // module.groups)
             )
             flops = 2 * kernel_ops * module.out_channels * out_h * out_w
-            # Adicionar bias
+            # Add bias
             if module.bias is not None:
                 flops += module.out_channels * out_h * out_w
             flops_by_layer["conv"] += flops
@@ -177,7 +177,7 @@ def calculate_flops(model: nn.Module, input_size: Tuple[int, ...]) -> Dict[str, 
             flops_by_layer["norm"] += 5 * output.numel()
 
         elif class_name == 'LayerNorm':
-            # Similar ao BatchNorm
+            # Similar to BatchNorm
             flops_by_layer["norm"] += 5 * output.numel()
 
         elif class_name in ['InstanceNorm2d', 'InstanceNorm1d']:
@@ -188,11 +188,11 @@ def calculate_flops(model: nn.Module, input_size: Tuple[int, ...]) -> Dict[str, 
 
         # Activation functions
         elif class_name in ['ReLU', 'ReLU6', 'LeakyReLU', 'PReLU']:
-            # 1 comparação por elemento
+            # 1 comparison per element
             flops_by_layer["activation"] += output.numel()
 
         elif class_name in ['GELU', 'SiLU', 'Swish', 'Mish']:
-            # Aproximadamente 8 ops por elemento (sigmoid, multiply, etc)
+            # Approximately 8 ops per element (sigmoid, multiply, etc)
             flops_by_layer["activation"] += 8 * output.numel()
 
         elif class_name == 'Sigmoid':
@@ -203,7 +203,7 @@ def calculate_flops(model: nn.Module, input_size: Tuple[int, ...]) -> Dict[str, 
             flops_by_layer["activation"] += 3 * output.numel()
 
         elif class_name == 'Softmax':
-            # exp para cada elemento + soma + divisão
+            # exp for each element + sum + division
             flops_by_layer["activation"] += 3 * output.numel()
 
         # Pooling layers
@@ -211,18 +211,18 @@ def calculate_flops(model: nn.Module, input_size: Tuple[int, ...]) -> Dict[str, 
             kernel_size = module.kernel_size
             if isinstance(kernel_size, int):
                 kernel_size = (kernel_size, kernel_size)
-            # Comparações dentro do kernel
+            # Comparisons within the kernel
             flops_by_layer["pool"] += output.numel() * (kernel_size[0] * kernel_size[1] - 1)
 
         elif class_name in ['AvgPool2d', 'AvgPool1d']:
             kernel_size = module.kernel_size
             if isinstance(kernel_size, int):
                 kernel_size = (kernel_size, kernel_size)
-            # Soma + divisão
+            # Sum + division
             flops_by_layer["pool"] += output.numel() * (kernel_size[0] * kernel_size[1])
 
         elif class_name in ['AdaptiveAvgPool2d', 'AdaptiveAvgPool1d']:
-            # Estimar baseado no input size
+            # Estimate based on input size
             if len(input) > 0 and input[0] is not None:
                 input_elements = input[0].numel()
                 output_elements = output.numel()
@@ -247,7 +247,7 @@ def calculate_flops(model: nn.Module, input_size: Tuple[int, ...]) -> Dict[str, 
 
             # QKV projections: 3 * 2 * seq_len * embed_dim * embed_dim
             qkv_flops = 3 * 2 * seq_len * embed_dim * embed_dim
-            # Attention: seq_len * seq_len * embed_dim (para cada head)
+            # Attention: seq_len * seq_len * embed_dim (per head)
             attn_flops = 2 * num_heads * seq_len * seq_len * (embed_dim // num_heads)
             # Output projection
             out_flops = 2 * seq_len * embed_dim * embed_dim
@@ -291,8 +291,8 @@ def measure_inference_time(
     warmup_iterations: int = 10
 ) -> Dict[str, float]:
     """
-    Mede tempo de inferência usando CUDA Events para GPU (mais preciso).
-    Retorna tempos médios, throughput e uso de memória.
+    Measures inference time using CUDA Events for GPU (more precise).
+    Returns average times, throughput, and memory usage.
     """
     model.eval()
     model.to(device)
@@ -310,10 +310,10 @@ def measure_inference_time(
         torch.cuda.synchronize()
         torch.cuda.reset_peak_memory_stats()
 
-    # Medir memória antes
+    # Measure memory before
     mem_before = get_memory_usage()
 
-    # Preparar timing
+    # Prepare timing
     cpu_times = []
     gpu_times = []
 

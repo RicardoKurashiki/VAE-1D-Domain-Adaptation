@@ -2,9 +2,6 @@
 
 Minimal pipeline to train the ResNet-18 classifier (Kermany/RSNA), extract its
 features, and train/test the VAE 1D domain-alignment autoencoder (CenterLoss).
-This is a trimmed-down slice of `MedicalImagingClassifier`: no plot/report
-generation, only the numeric artifacts (`.json`/`.npy`) needed to train and
-evaluate the model and the alignment.
 
 ## Setup
 
@@ -26,14 +23,7 @@ This produces `data/processed/kermany/` and `data/processed/rsna/`, each with `t
 
 ## Configuration
 
-There is a single scenario, and it lives entirely in code: the `CONFIG` block
-at the top of `main.py`. Edit the constants there to change any setting
-(batch size, epochs, `align_weight`, `kl_weight`, `TARGET_DATA_FRACTIONS`,
-etc.) — there is no YAML config file. The only thing that varies at runtime
-is which dataset is the source, controlled by `--source`.
-
-The default alignment scenario is VAE + CenterLoss with `align_weight=0.9`,
-`kl_weight=0.1`, swept across every fraction in `TARGET_DATA_FRACTIONS`.
+There is a single scenario, and it lives entirely in code: the `CONFIG` block at the top of `main.py`. Edit the constants there to change any setting (batch size, epochs, `align_weight`, `kl_weight`, `TARGET_DATA_FRACTIONS`, etc.). Use the `--source` argument to specify which dataset to use as the source.
 
 ## Running
 
@@ -43,8 +33,7 @@ python main.py --source rsna
 ```
 
 Each run trains the ResNet-18 on the source dataset, tests it cross-dataset,
-extracts features, computes per-class centroids (KMeans), and trains/tests
-the VAE alignment autoencoder against the other dataset for every fraction in
+extracts features, computes per-class centroids using the mean distribuition (KMeans), and trains/tests the VAE alignment autoencoder against the other dataset for every fraction in
 `TARGET_DATA_FRACTIONS`.
 
 Outputs go to `results/resnet18_<source>/`:

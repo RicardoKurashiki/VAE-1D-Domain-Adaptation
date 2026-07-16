@@ -75,7 +75,7 @@ def run(
         }
 
     if verbose:
-        print("Treinando modelo a partir do dataset:", dataset_path)
+        print("Training model from dataset:", dataset_path)
 
     transform = build_augmentation_transforms(config, is_training=True, model_name=backbone)
     val_transform = get_validation_transforms(model_name=backbone)
@@ -111,7 +111,7 @@ def run(
     os.makedirs(output_path, exist_ok=True)
     architecture_file = classification_model.save_architecture(output_path)
     if verbose:
-        print(f"Arquitetura do modelo salva em: {architecture_file}")
+        print(f"Model architecture saved to: {architecture_file}")
 
     model = classification_model.model
 
@@ -130,7 +130,7 @@ def run(
 
     if config.get('mini_batch', mini_batch):
         if verbose:
-            print("Utilizando mini-batch")
+            print("Using mini-batch")
         train_sampler = BatchSampler(train_dataset, batch_size)
         train_loader = DataLoader(
             train_dataset,
@@ -142,11 +142,11 @@ def run(
         )
     else:
         if verbose:
-            print("Utilizando batch size")
+            print("Using batch size")
         train_loader = DataLoader(
             train_dataset,
             batch_size=batch_size,
-            shuffle=True,  # Shuffle para melhor generalização
+            shuffle=True,  # Shuffle for better generalization
             pin_memory=True,
             num_workers=NUM_WORKERS,
             persistent_workers=use_persistent,
@@ -156,7 +156,7 @@ def run(
     val_loader = DataLoader(
         val_dataset,
         batch_size=batch_size,
-        shuffle=False,  # Não shuffle no validation
+        shuffle=False,  # No shuffle for validation
         pin_memory=True,
         num_workers=NUM_WORKERS,
         persistent_workers=use_persistent,
@@ -186,7 +186,7 @@ def run(
     )
 
     if verbose:
-        print("Salvando pesos do modelo...")
+        print("Saving model weights...")
 
     os.makedirs(output_path, exist_ok=True)
 
@@ -203,7 +203,7 @@ def run(
     )
 
     if verbose:
-        print("Salvando métricas...")
+        print("Saving metrics...")
 
     metrics_file = os.path.join(output_path, "model_metrics.json")
     all_metrics = {
@@ -216,6 +216,6 @@ def run(
         json.dump(all_metrics, f, indent=2)
 
         if verbose:
-            print(f"Métricas salvas em {metrics_file}")
+            print(f"Metrics saved to {metrics_file}")
 
     return output_path

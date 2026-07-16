@@ -31,7 +31,7 @@ def train_model(
         "total_time_seconds": 0,
         "epoch_times": [],
         "batch_times": {"train": [], "val": []},
-        "throughput": {"train": [], "val": []},  # samples/segundo
+        "throughput": {"train": [], "val": []},  # samples/second
         "memory_usage": [],
         "model_info": {
             **get_parameters_count(model),
@@ -45,7 +45,7 @@ def train_model(
     with TemporaryDirectory() as tempdir:
         best_model_params_path = tempdir
         if verbose:
-            print(f"Melhores pesos salvos em {best_model_params_path}")
+            print(f"Best weights saved to {best_model_params_path}")
         best_val_loss = float("inf")
         patience_counter = 0
         early_stop = False
@@ -55,7 +55,7 @@ def train_model(
         for epoch in range(num_epochs):
             if early_stop:
                 if verbose:
-                    print(f"Early stopping acionado na época {epoch}")
+                    print(f"Early stopping triggered at epoch {epoch}")
                 break
             epoch_start = time.time()
             if verbose:
@@ -119,7 +119,7 @@ def train_model(
                 epoch_loss = running_loss / total_samples_processed
                 epoch_acc = running_corrects.float() / total_samples_processed
 
-                # Salvar métricas computacionais da fase
+                # Save the phase's computational metrics
                 avg_batch_time = (
                     sum(batch_times) / len(batch_times) if batch_times else 0
                 )
@@ -152,7 +152,7 @@ def train_model(
                 else:
                     history["val_loss"].append(epoch_loss)
                     history["val_acc"].append(epoch_acc.item())
-                    current_val_loss = epoch_loss  # Salva para usar no scheduler
+                    current_val_loss = epoch_loss  # Save to use in the scheduler
 
                 if verbose:
                     print(
@@ -162,25 +162,25 @@ def train_model(
                 if phase == "val":
                     if epoch_loss < best_val_loss:
                         if verbose:
-                            print(f"Loss val melhorou de {best_val_loss:.4f} para {epoch_loss:.4f}")
+                            print(f"Val loss improved from {best_val_loss:.4f} to {epoch_loss:.4f}")
                         best_val_loss = epoch_loss
                         patience_counter = 0
                         model.save_weights(best_model_params_path)
                     elif early_stopping_patience is not None:
                         patience_counter += 1
                         if verbose:
-                            print(f"Loss val não melhorou de {best_val_loss:.4f} - Paciência: {patience_counter}")
+                            print(f"Val loss did not improve from {best_val_loss:.4f} - Patience: {patience_counter}")
                         if patience_counter >= early_stopping_patience:
                             early_stop = True
                             if verbose:
-                                print("Early stopping acionado")
+                                print("Early stopping triggered")
                             break
 
             if early_stop:
                 break
 
             if scheduler is not None:
-                # ReduceLROnPlateau precisa da métrica de validação
+                # ReduceLROnPlateau needs the validation metric
                 if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
                     scheduler.step(current_val_loss)
                 else:
@@ -213,15 +213,15 @@ def train_model(
 
         if verbose:
             print(
-                f"Treinamento completo em {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s"
+                f"Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s"
             )
         if verbose:
-            print(f"Melhor loss [val]: {best_val_loss:.4f}")
+            print(f"Best loss [val]: {best_val_loss:.4f}")
 
         model.load_weights(best_model_params_path)
 
-        # Adicionar métricas de inferência e FLOPs ao final
-        print("Calculando métricas de inferência e complexidade...")
+        # Add inference and FLOPs metrics at the end
+        print("Computing inference and complexity metrics...")
         input_shape = next(iter(dataloaders['train']))[0].shape
         metrics["flops"] = calculate_flops(model, input_shape)
         metrics["inference_metrics"] = measure_inference_time(model, input_shape)
@@ -239,29 +239,29 @@ def train_model_no_early_stopping(
     verbose=False,
 ):
     """
-    Treina o modelo por exatamente num_epochs épocas, sem early stopping.
-    Implementa a metodologia de treinamento de Kundu et al.
+    Trains the model for exactly num_epochs epochs, without early stopping.
+    Implements the training methodology from Kundu et al.
 
     Args:
-        model: Modelo a ser treinado
-        pretrained_model: Nome do backbone pré-treinado
-        dataloaders: Dict com 'train' e 'val' DataLoaders
-        criterion: Função de loss
-        optimizer: Otimizador
-        scheduler: Learning rate scheduler (opcional)
-        num_epochs: Número exato de épocas para treinar (default: 30)
-        verbose: Se True, imprime progresso detalhado
+        model: Model to be trained
+        pretrained_model: Name of the pretrained backbone
+        dataloaders: Dict with 'train' and 'val' DataLoaders
+        criterion: Loss function
+        optimizer: Optimizer
+        scheduler: Learning rate scheduler (optional)
+        num_epochs: Exact number of epochs to train for (default: 30)
+        verbose: If True, prints detailed progress
 
     Returns:
-        model: Modelo treinado (estado da última época)
-        history: Dict com histórico de loss e accuracy
-        metrics: Dict com métricas computacionais
+        model: Trained model (state of the last epoch)
+        history: Dict with loss and accuracy history
+        metrics: Dict with computational metrics
     """
     if verbose:
-        print(f"Movendo modelo para device: {device}...")
+        print(f"Moving model to device: {device}...")
     model = model.to(device)
     if verbose:
-        print(f"Modelo movido para {device} com sucesso!")
+        print(f"Model moved to {device} successfully!")
 
     since = time.time()
 
@@ -287,7 +287,7 @@ def train_model_no_early_stopping(
         history = {"train_loss": [], "train_acc": [], "val_loss": [], "val_acc": []}
 
         if verbose:
-            print("Iniciando loop de épocas...")
+            print("Starting epoch loop...")
 
         for epoch in range(num_epochs):
             epoch_start = time.time()
@@ -308,7 +308,7 @@ def train_model_no_early_stopping(
                 batch_times = []
 
                 if verbose and epoch == 0:
-                    print(f"Carregando primeiro batch de {phase}...")
+                    print(f"Loading first {phase} batch...")
 
                 pbar = tqdm(
                     dataloaders[phase],
@@ -421,14 +421,14 @@ def train_model_no_early_stopping(
             torch.cuda.reset_peak_memory_stats()
 
         if verbose:
-            print(f"Treinamento completo em {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s")
-            print(f"Melhor loss [val]: {best_val_loss:.4f}")
+            print(f"Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s")
+            print(f"Best loss [val]: {best_val_loss:.4f}")
 
-        # Carrega o melhor modelo (diferente do original que usa o último)
-        # Mantemos esse comportamento para consistência com avaliação
+        # Load the best model (unlike the original, which uses the last one)
+        # We keep this behavior for consistency with evaluation
         model.load_weights(best_model_params_path)
 
-        print("Calculando métricas de inferência e complexidade...")
+        print("Computing inference and complexity metrics...")
         input_shape = next(iter(dataloaders['train']))[0].shape
         metrics["flops"] = calculate_flops(model, input_shape)
         metrics["inference_metrics"] = measure_inference_time(model, input_shape)

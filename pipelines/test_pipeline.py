@@ -156,7 +156,7 @@ def classification_report(results, class_names=None):
     num_classes = len(class_names)
     report = {}
 
-    # Calcular métricas por classe
+    # Compute per-class metrics
     for c, class_name in enumerate(class_names):
         metrics = results["class_metrics"][c]
         TP = metrics["TP"]
@@ -213,7 +213,7 @@ def run(
         output_dir = weights_dir
     from utils.augmentation_builder import get_validation_transforms
 
-    # Usar transforms específicos do modelo
+    # Use model-specific transforms
     transform = get_validation_transforms(model_name=pretrained_model)
     data = load_data(
         cross_dataset_path,
@@ -226,11 +226,11 @@ def run(
     n_classes = test_dataset.n_classes
 
     if verbose:
-        print(f"Carregando modelo com {n_classes} classes...")
+        print(f"Loading model with {n_classes} classes...")
     model = load_model(weights_dir, pretrained_model, n_classes)
 
     if verbose:
-        print(f"Carregando dataset de teste de {cross_dataset_path}")
+        print(f"Loading test dataset from {cross_dataset_path}")
 
     test_loader = DataLoader(
         test_dataset,
@@ -242,7 +242,7 @@ def run(
     )
 
     if verbose:
-        print(f"Total de amostras de teste: {len(test_dataset)}")
+        print(f"Total test samples: {len(test_dataset)}")
 
     if hasattr(test_dataset, "unique_labels"):
         class_names = list(test_dataset.unique_labels)
@@ -299,4 +299,4 @@ def run(
             np.array(results["labels"], dtype=np.int64))
 
     if verbose:
-        print(f"\nResultados de teste salvos em {json_path}")
+        print(f"\nTest results saved to {json_path}")

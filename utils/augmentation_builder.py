@@ -2,7 +2,7 @@ from torchvision import transforms
 from utils.add_random_noise import AddRandomNoise
 
 
-# Configuração de normalização/entrada (ResNet-18, ImageNet)
+# Input/normalization configuration (ResNet-18, ImageNet)
 MODEL_CONFIGS = {
     "default": {
         "input_size": 224,
@@ -14,7 +14,7 @@ MODEL_CONFIGS = {
 
 
 def get_model_config(model_name):
-    """Retorna a configuração específica do modelo ou a configuração padrão."""
+    """Returns the model-specific configuration or the default configuration."""
     return MODEL_CONFIGS.get(model_name, MODEL_CONFIGS["default"])
 
 

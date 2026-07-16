@@ -35,24 +35,24 @@ class FeatureExtractor(nn.Module):
         return x
 
     def _unfreeze_layers(self):
-        # Congelar todo o backbone primeiro
+        # Freeze the whole backbone first
         for p in self.backbone_model.parameters():
             p.requires_grad = False
 
-        # Se trainable_layers for None, "none", ou <= 0, manter tudo congelado
+        # If trainable_layers is None, "none", or <= 0, keep everything frozen
         if self.trainable_layers is None or self.trainable_layers == "none":
             return
 
         if isinstance(self.trainable_layers, int) and self.trainable_layers <= 0:
             return
 
-        # Se trainable_layers == "all", descongelar tudo
+        # If trainable_layers == "all", unfreeze everything
         if self.trainable_layers == "all":
             for p in self.backbone_model.parameters():
                 p.requires_grad = True
             return
 
-        # Se trainable_layers é um número, descongelar apenas as últimas N camadas Conv2d
+        # If trainable_layers is a number, unfreeze only the last N Conv2d layers
         if isinstance(self.trainable_layers, int):
             indexed = [
                 (idx, name, module)
@@ -64,7 +64,7 @@ class FeatureExtractor(nn.Module):
                 if isinstance(module, nn.Conv2d)
             ]
             if len(convs) < self.trainable_layers:
-                raise ValueError("O modelo não contém camadas Conv2d suficientes.")
+                raise ValueError("The model does not contain enough Conv2d layers.")
 
             conv_idx = convs[-self.trainable_layers][0]
             for idx, _, module in indexed:

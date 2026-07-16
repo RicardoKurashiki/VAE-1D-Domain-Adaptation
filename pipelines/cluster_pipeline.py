@@ -4,9 +4,9 @@ from sklearn.cluster import KMeans
 
 
 def run(model_path, dataset_name, k, source_dataset_name=None, features_dir=None):
-    """Fita KMeans no source e salva os centróides (protótipos por classe) usados
-    como âncoras da CenterLoss no treinamento do autoencoder de alinhamento.
-    Datasets alvo não geram centróides próprios — não são plotados nem usados."""
+    """Fits KMeans on the source and saves the centroids (per-class prototypes) used
+    as anchors for CenterLoss when training the alignment autoencoder.
+    Target datasets do not generate their own centroids — they are not plotted or used."""
     if source_dataset_name is None:
         source_dataset_name = dataset_name
 
