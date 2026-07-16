@@ -79,9 +79,9 @@ RUN_FEATURE_EXTRACTION = True
 RUN_CLUSTERING = True
 K_CLUSTERS = 2  # KMeans centroids for the alignment CenterLoss (= number of classes)
 
-# Domain-alignment autoencoder: VAE + CenterLoss, align_weight=0.9, kl_weight=0.1
-# (mmd_weight is derived: 1 - align_weight - kl_weight = 0.0). Swept across every
-# fraction of target-domain data the aligner is allowed to see during training.
+# Domain-alignment autoencoder: VAE + CenterLoss, align_weight=0.9, kl_weight=0.1.
+# Swept across every fraction of target-domain data the aligner is allowed to
+# see during training.
 RUN_AUTOENCODER_TRAINING = True
 RUN_AUTOENCODER_TEST = True
 AUTOENCODER_ARCHITECTURE = "vae"
@@ -93,7 +93,7 @@ AE_EPOCHS = 500
 AE_LEARNING_RATE = 1e-4
 AE_BATCH_SIZE = 64
 AE_EARLY_STOPPING_PATIENCE = 10
-TARGET_DATA_FRACTIONS = [1.0, 0.8, 0.4, 0.2, 0.1, 0.05, 0.01]
+TARGET_DATA_FRACTIONS = [1.0, 0.8, 0.4, 0.2, 0.1, 0.05]
 # ═══════════════════════════════════════════════════════════════════════════════
 
 parser = argparse.ArgumentParser(prog="VAE 1D Domain Adaptation")

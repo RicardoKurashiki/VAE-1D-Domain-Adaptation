@@ -33,8 +33,7 @@ etc.) — there is no YAML config file. The only thing that varies at runtime
 is which dataset is the source, controlled by `--source`.
 
 The default alignment scenario is VAE + CenterLoss with `align_weight=0.9`,
-`kl_weight=0.1` (so `mmd_weight = 1 - align_weight - kl_weight = 0.0`), swept
-across every fraction in `TARGET_DATA_FRACTIONS`.
+`kl_weight=0.1`, swept across every fraction in `TARGET_DATA_FRACTIONS`.
 
 ## Running
 
