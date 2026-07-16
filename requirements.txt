@@ -1,0 +1,11 @@
+torch
+torchvision
+numpy
+pyyaml
+scikit-learn
+psutil
+tqdm
+thop
+pandas
+pillow
+pydicom

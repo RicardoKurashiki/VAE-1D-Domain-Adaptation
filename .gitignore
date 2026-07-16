@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+
+data/original/
+data/processed/
+
+results/
+experiment_logs/
+cache/
